@@ -1,0 +1,79 @@
+/* ../styles/TaskList.css */
+
+.container {
+  max-width: 600px;
+  margin: 20px auto; /* Centraliza horizontalmente */
+  padding: 10px; /* 20px Espaço interno */
+  text-align: center;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #a59c9c;
+}
+
+.container h1 {
+  margin-bottom: 20px; /*  20px         */
+}
+
+.container ul {
+  list-style-type: none;
+  padding: 0px; /* 0 Espaço interno */
+}
+
+.container li {
+  margin-bottom: 4px; /* Espaço entre os itens */
+  padding: 1px 10px; /* 10px Espaço interno */
+  background-color: rgb(204, 198, 198);
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Alinha itens no centro verticalmente */
+  font-size: 14px;
+}
+
+.link-edit {
+  text-decoration: none;
+  margin: 0 0px; /* Espaço entre o link de editar e o botão de excluir */
+  align-items: center;
+  
+}
+
+.Excluir {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  margin: auto 0;  /*Centraliza verticalmente */
+}
+
+.Excluir:hover {
+  background-color: #c82333;
+}
+
+
+
+.container a {
+  margin: auto 0;
+  padding: 5px 10px;
+  background-color: #28a745;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.container a:hover {
+  background-color: #218838;
+  margin-top: 10px;
+  display: inline-block;
+  padding: 5px 10px;
+  gap: 10px 30px;
+}
+
+
+

@@ -1,0 +1,501 @@
+//    ../components/Api.tsx
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://jsonplaceholder.typicode.com',
+});
+
+export const getTasks = () => api.get('/todos');
+export const addTask = (task: { title: string; description: string }) => api.post('/todos', task);
+export const updateTask = (id: number, task: { title: string; description: string; completed: boolean }) => api.put(`/todos/${id}`, task);
+export const deleteTask = (id: number) => api.delete(`/todos/${id}`);
+
+
+//   ../components/App.tsx
+//import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import TaskList from '../components/TaskList';
+import TaskForm from '../components/TaskForm';
+import TaskDetails from '../components/TaskDetails';
+import '../styles/App.css';
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<TaskList/>} />
+        <Route path="/add" element={<TaskForm/> } />
+        <Route path="/edit/:id" element={<TaskDetails/>} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+
+//  ../components/TaskDetails.tsx
+
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import '../styles/TaskDetails.css';
+// import data from './public/tasks.json';
+
+function TaskDetails() {
+  const [task, setTask] = useState({ title: '', description: '', completed: false });
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Carrega o arquivo JSON do LocalStorage
+    const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    const task = storedTasks.find((t: any) => t.id === parseInt(id!, 10));
+    setTask(task || { title: '', description: '', completed: false });
+  }, [id]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Carrega o arquivo JSON do LocalStorage
+    const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+
+    // Atualiza a tarefa
+    const updatedTasks = storedTasks.map((t: any) => 
+      t.id === parseInt(id!, 10) ? { ...t, ...task } : t
+    );
+
+    // Converte para string JSON e salva no LocalStorage
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+
+    // Redireciona para a página inicial
+    navigate('/');
+  };
+
+  const toggleCompleted = () => {
+    setTask({ ...task, completed: !task.completed });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" value={task.title} onChange={(e) => setTask({ ...task, title: e.target.value })} placeholder="Título" required />
+      <input type="text" value={task.description} onChange={(e) => setTask({ ...task, description: e.target.value })} placeholder="Descrição" required />
+      <button type="button" onClick={toggleCompleted}>
+        {task.completed ? 'Desmarcar' : 'Marcar'} como concluída
+      </button>
+      <button type="submit">Salvar</button>
+    </form>
+  );
+}
+export default TaskDetails;
+
+
+//  ../components/TaskForm.tsx
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../styles/TaskForm.css';
+// import data from './public/tasks.json';
+
+function TaskForm() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Carrega o arquivo JSON do LocalStorage
+    const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+
+    // Adiciona a nova tarefa
+    const newTask = {
+      id: Date.now(), // Use Date.now() para gerar um ID único
+      title: title,
+      description: description,
+      completed: false
+    };
+    storedTasks.push(newTask);
+
+    // Converte para string JSON e salva no LocalStorage
+    localStorage.setItem('tasks', JSON.stringify(storedTasks));
+
+    // Redireciona para a página inicial
+    navigate('/');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título" required />
+      <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descrição" required />
+      <button type="submit">Salvar</button>
+    </form>
+  );
+}
+export default TaskForm;
+
+
+// ../components/TaskList.tsx  
+
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import '../styles/TaskList.css';
+//import data from './public/tasks.json';
+
+type Task = {
+  id: number;
+  title: string;
+  description: string;
+  completed: boolean;
+};
+
+function TaskList() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    // Carrega o arquivo JSON do LocalStorage
+    const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    setTasks(storedTasks);
+  }, []);
+
+  const handleDelete = (id: number) => {
+    // Atualiza o array de tarefas removendo a tarefa com o ID especificado
+    const updatedTasks = tasks.filter(task => task.id !== id);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    setTasks(updatedTasks);
+  };
+
+  return (
+    <div>
+      <h1>Tarefas</h1>
+      <ul>
+        {tasks.map((task: any) => (
+          <li key={task.id}>
+            <Link to={`/edit/${task.id}`}>Editar</Link>
+            <button onClick={() => handleDelete(task.id)}>Excluir</button>
+            {task.title} - {task.description} - {task.completed ? 'Concluída' : 'Pendente'}
+          </li>
+        ))}
+      </ul>
+      <Link to="/add">Adicionar Tarefa</Link>
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+// ./index.tsx
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './components/App';
+import './styles/App.css';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+
+// ./main.tsx
+
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './components/App.tsx'
+import './index.css'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+Dado os arquivos tsx do gerenciador de tarefas, como criar um arquivo .json para 
+salvar e atualizar e ou editar as tarefas inseridas.
+mostrar onde estará este arquivo .json e, em que componentes será importado.
+
+
+
+
+#####################################################################################################
+#####################################################################################################
+
+
+//    ../components/Api.tsx
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://jsonplaceholder.typicode.com',
+});
+
+export const getTasks = () => api.get('/todos');
+export const addTask = (task: { title: string; description: string }) => api.post('/todos', task);
+export const updateTask = (id: number, task: { title: string; description: string; completed: boolean }) => api.put(`/todos/${id}`, task);
+export const deleteTask = (id: number) => api.delete(`/todos/${id}`);
+
+
+
+//   ../components/App.tsx
+//import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import TaskList from '../components/TaskList';
+import TaskForm from '../components/TaskForm';
+import TaskDetails from '../components/TaskDetails';
+import '../styles/App.css';
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<TaskList/>} />
+        <Route path="/add" element={<TaskForm/> } />
+        <Route path="/edit/:id" element={<TaskDetails/>} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+
+//  ../components/TaskDetails.tsx
+
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getTasks, updateTask } from '../components/Api';
+import '../styles/TaskDetails.css';
+
+function TaskDetails() {
+  const [task, setTask] = useState({ title: '', description: '', completed: false });
+  const { id } = useParams<{ id: string }>();
+  const Navigate = useNavigate();
+
+  useEffect(() => {
+    getTasks().then((response) => {
+      const task = response.data.find((t: any) => t.id === parseInt(id!, 10));
+      setTask(task || { title: '', description: '', completed: false });
+    });
+  }, [id]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateTask(parseInt(id!), task).then(() => Navigate('/'));
+  };
+
+  const toggleCompleted = () => {
+    setTask({ ...task, completed: !task.completed });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" value={task.title} onChange={(e) => setTask({ ...task, title: e.target.value })} placeholder="Título" required />
+      <input type="text" value={task.description} onChange={(e) => setTask({ ...task, description: e.target.value })} placeholder="Descrição" required />
+      <button type="button" onClick={toggleCompleted}>
+        {task.completed ? 'Desmarcar' : 'Marcar'} como concluída
+      </button>
+      <button type="submit">Salvar</button>
+    </form>
+  );
+}
+
+export default TaskDetails;
+
+
+//  ../components/TaskForm.tsx
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import data from './public/tasks.json';
+function TaskForm() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const Navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Carrega o arquivo JSON
+    const data = {
+      tarefas: []
+    };
+
+    // Adiciona a nova tarefa
+    const newTask = {
+      title: title,
+      description: description,
+      status: 'pendente'
+    };
+    data.tarefas.push(newTask);
+
+    // Converte para string JSON
+    const jsonString = JSON.stringify(data, null, 2);
+
+    // Cria um Blob e força o download
+    const file = new Blob([jsonString], { type: 'application/json' });
+    const fileURL = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = fileURL;
+    a.download = 'tasks.json';
+    a.click();
+    URL.revokeObjectURL(fileURL);
+
+    // Redireciona para a página inicial
+    Navigate('/');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título" required />
+      <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descrição" required />
+      <button type="submit">Salvar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+
+// ../components/TaskList.tsx  
+
+import  { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getTasks, deleteTask } from '../components/Api';
+import '../styles/TaskList.css';
+import data from './public/tasks.json';
+
+function TaskList() {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    getTasks().then((response) => setTasks(response.data));
+  }, []);
+
+  return (
+    <div>
+      <h1>Tarefas</h1>
+      <ul>
+        {tasks.map((task: any) => (
+          <li key={task.id}>
+            <Link to={`/edit/${task.id}`}>Editar</Link>
+            <button onClick={() => deleteTask(task.id)}>Excluir</button>
+            {task.title} - {task.description} - {task.completed ? 'Concluída' : 'Pendente'}
+          </li>
+        ))}
+      </ul>
+      <Link to="/add">Adicionar Tarefa</Link>
+    </div>
+  );
+}
+
+export default TaskList;
+
+Dado os códigos do gerenciador de tarefas, criar um arquivo json 
+para salvar e atualizar as tarefas inseridas e ou modificadas. 
+mostrar em que componente sera importado o código json.
+
+TakList.tsx
+
+<div className='container'>
+      <h1>Tarefas</h1>
+      <ul>
+        {tasks.map((task: any) => (
+          <li key={task.id}>
+            <Link className='link-edit' to={`/edit/${task.id}`}>Editar</Link>
+            <button className='Excluir' onClick={() => handleDelete(task.id)}>Excluir</button>
+            {task.title} - {task.description} - {task.completed ? 'Concluída' : 'Pendente'}
+          </li>
+        ))}
+      </ul>
+      <Link to="/add">Adicionar Tarefa</Link>
+    </div>
+
+    TaskList.css
+.container {
+  max-width: 600px;
+  margin: 20px auto; /* Centraliza horizontalmente */
+  padding: 10px; /* 20px Espaço interno */
+  text-align: center;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #a59c9c;
+}
+
+.container h1 {
+  margin-bottom: 20px; /*  20px         */
+}
+
+.container ul {
+  list-style-type: none;
+  padding: 0px; /* 0 Espaço interno */
+}
+
+.container li {
+  margin-bottom: 4px; /* Espaço entre os itens */
+  padding: 1px 10px ; /* 10px Espaço interno */
+  background-color: rgb(204, 198, 198);
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+}
+
+.link-edit {
+  text-decoration: none;
+  color: #007bff; 
+  margin: 2px; /*10px Espaço entre o link de editar e o botão de excluir*/
+  /* gap: 10px 30px; */
+  align-items: baseline;
+}
+
+.Excluir {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  margin:auto
+}
+
+.Excluir:hover {
+  background-color: #c82333;
+}
+
+.container a {
+  /* display: inline-block; */
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #28a745;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  
+}
+
+.container a:hover {
+  margin-top: 10px;
+  display: inline-block;
+  background-color: #218838;
+  padding: 5px 10px;
+  gap: 10px 30px;
+  
+}
+
+Dados os códigos acima, corrigir o TasList.css para que o link editar esteja alinhado 
+com o botão "Excluir". O Link "Editar" o botão "Excluir devem estar alinhados e justificados,
+dentro do container filho.
+
+
+
+
+
+
+

@@ -1,0 +1,104 @@
+/* ../styles/TaskDetails.css */
+
+.form-container {
+  max-width: 300px;
+  margin: 20px auto; /* Margem superior de 20px e centralizado horizontalmente */
+  padding: 20px;
+  background-color: rgb(204, 198, 198);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-container input[type="text"] {
+  margin-bottom: 10px;
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.form-container .Button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.form-container .Button-concluido {
+  margin-right: 10px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.form-container .Button-concluido:hover {
+  background-color: #0056b3;
+}
+
+.form-container .Button-salvar {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.form-container .Button-salvar:hover {
+  background-color: #218838;
+}
+
+
+
+
+
+
+/* Explicação do CSS
+.form-container:
+
+display: flex;: Define o layout flexível.
+flex-direction: column;: Organiza os elementos em uma coluna.
+align-items: center;: Centraliza os itens horizontalmente.
+padding: 20px;: Adiciona padding interno.
+border: 1px solid #ccc;: Adiciona uma borda.
+border-radius: 5px;: Arredonda os cantos.
+width: 300px;: Define a largura do container.
+margin: auto;: Centraliza o container horizontalmente.
+.form-container input:
+
+width: 100%;: Define a largura dos inputs como 100%.
+margin-bottom: 10px;: Adiciona espaço entre os inputs.
+padding: 10px;: Adiciona padding interno.
+border: 1px solid #ccc;: Adiciona uma borda.
+border-radius: 3px;: Arredonda os cantos.
+.Button-container:
+
+display: flex;: Define o layout flexível.
+justify-content: center;: Centraliza os botões horizontalmente.
+margin-top: 10px;: Adiciona espaço entre os inputs e os botões.
+.Button-concluido e .Button-salvar:
+
+margin: 0 5px;: Adiciona espaço entre os botões.
+padding: 10px 20px;: Define o padding dos botões.
+border: 1px solid #ccc;: Adiciona uma borda.
+border-radius: 3px;: Arredonda os cantos.
+cursor: pointer;: Muda o cursor para um ponteiro ao passar sobre os botões.
+Estilos específicos para cada botão:
+
+.Button-concluido: Define a cor de fundo do botão "Marcar como concluída".
+.Button-salvar: Define a cor de fundo e a borda do botão "Salvar". */
+
+  
+  
+  
+  
+ 
